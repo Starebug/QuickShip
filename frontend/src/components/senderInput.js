@@ -18,17 +18,23 @@ const SenderInput = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const currentDate = new Date().toISOString(); // Get current date in ISO format
-    const formDataWithDate = { ...formData, date: currentDate }; // Include date in the data
-    console.log(formDataWithDate);
+  
+    const { from, to } = formData;
+    const currentDate = new Date().toISOString(); // Current date in ISO format
+    
     try {
-      const response = await axios.post("http://localhost:8000/api/sender", formDataWithDate); // Send form data along with the current date
-      setTravellers(response.data); // Update state with fetched travellers
+      // Pass search parameters in the query string
+      const response = await axios.get("http://localhost:8000/api/sender", {
+        params: { from, to, date: currentDate }, // Add necessary query params
+      });
+  
+      setTravellers(response.data); // Update state with fetched travelers
     } catch (error) {
       console.error("Error fetching travellers:", error);
       setError("Error fetching travellers. Please try again."); // Set error message
     }
   };
+  
 
   return (
     <div className="container mx-auto py-16 px-6 lg:px-8">

@@ -2,8 +2,14 @@ import React, { useState } from "react";
 import { Modal, Button } from "@mui/material";
 import CustomerReviews from "./customer-rev";
 import {useNavigate } from "react-router-dom";
-
+import axios from "axios";
 const ShipmentPage = () => {
+  const [formData, setFormData] = useState({
+    name:"",
+    from: "",
+    to: "",
+    departure: new Date(),
+  });
   const navigate = useNavigate();
   const [formType, setFormType] = useState("");
   const [open, setOpen] = useState(false);
@@ -14,6 +20,23 @@ const ShipmentPage = () => {
   };
 
   const handleClose = () => setOpen(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:8000/api/sender", formData); // Send form data along with the current date
+    } catch (error) {
+      alert("Sorry we encountered some error");
+      console.log("Sorry, we encountered some error. Try again later");
+      console.log(error);
+    }
+  };
 
   return (
     <div className="container mx-auto py-16 px-6 lg:px-8 bg-gray-50">
@@ -64,38 +87,48 @@ const ShipmentPage = () => {
               ? "Traveller Information"
               : "Parcel Information"}
           </h3>
-          <form className="flex flex-col gap-6">
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             <label className="text-sm font-semibold">Name</label>
             <input
               type="text"
+              name="name"
               placeholder="Name"
+              value={formData.name}
+              onChange={handleChange}
               className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             <label className="text-sm font-semibold">From</label>
             <input
               type="text"
+              name="from"
               placeholder="From"
+              value={formData.from}
+              onChange={handleChange}
               className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             <label className="text-sm font-semibold">To</label>
             <input
               type="text"
+              name="to"
               placeholder="To"
+              value={formData.to}
+              onChange={handleChange}
               className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             {formType === "traveller" && (
               <>
-                <label className="text-sm font-semibold">
-                  PNR Number (if applicable)
-                </label>
+                <label>
+                Departure:
                 <input
-                  type="text"
-                  placeholder="PNR Number (if applicable)"
-                  className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  type="date"
+                  name="departure"
+                  value={formData.departure}
+                  onChange={handleChange}
                 />
+              </label>
               </>
             )}
             {formType === "sender" && (
@@ -143,6 +176,7 @@ const ShipmentPage = () => {
               </label>
             </div>
             <Button
+              type="submit"
               variant="contained"
               color="primary"
               className="mt-6 py-3 bg-blue-600 hover:bg-blue-700"
